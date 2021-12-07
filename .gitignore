@@ -4,3 +4,4 @@ master.thesis.eclipse.plugin/.classpath
 *.jar
 master.thesis.eclipse.update.site/features/
 master.thesis.eclipse.update.site/plugins/
+master.thesis.eclipse.plugin/.settings/
