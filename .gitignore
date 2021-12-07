@@ -1,2 +1,6 @@
 .DS_Store
-
+master.thesis.eclipse.plugin/.classpath
+*.class
+*.jar
+master.thesis.eclipse.update.site/features/
+master.thesis.eclipse.update.site/plugins/
