@@ -41,6 +41,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import errors.BaseError;
 import errors.BitwiseOperatorError;
 import errors.EqualsOperatorError;
+import errors.IfWithoutBracketsError;
 import errors.IgnoringReturnError;
 import errors.SemiColonAfterIfError;
 import errors.StaticAsNormalError;
@@ -115,6 +116,9 @@ public class CodeAnalyser extends ASTVisitor {
 		if (ifStatement.getThenStatement() instanceof EmptyStatement) {
 			errors.add(new SemiColonAfterIfError(ifStatement.getStartPosition(), ifStatement.getLength()));
 			
+		}
+		if (!(ifStatement.getThenStatement().getNodeType() == ASTNode.BLOCK)) {
+			errors.add(new IfWithoutBracketsError(ifStatement.getStartPosition(), ifStatement.getLength()));
 		}
 		return super.visit(ifStatement);
 	}
