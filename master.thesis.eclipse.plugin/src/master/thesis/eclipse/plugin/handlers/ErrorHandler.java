@@ -30,8 +30,21 @@ public class ErrorHandler extends AbstractHandler {
 		ast.accept(analyser);
 		ArrayList<BaseError> errors = analyser.getErrors();
 		
-		Editor.printToConsole("Hello!");
-		Editor.printToConsole(errors.get(0).getWhat());
+		int totalErrors = errors.size();
+		
+		if (!errors.isEmpty()) {
+			
+			BaseError error = errors.get(0);
+			
+			
+			Editor.findAndMarkText(error.getOffset(), error.getLength());
+			
+			Editor.printToConsole(error.getWhat());
+			errors.remove(0);
+			
+		} else {
+			Editor.printToConsole("Found no errors!");
+		}
 		
 		return null;
 	}
