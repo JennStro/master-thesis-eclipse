@@ -6,25 +6,25 @@
          point="org.eclipse.ui.commands">
       <category
             id="master.thesis.eclipse.plugin.commands.category"
-            name="Sample Category">
+            name="Error Finder Category">
       </category>
       <command
             categoryId="master.thesis.eclipse.plugin.commands.category"
-            name="Sample Command"
-            id="master.thesis.eclipse.plugin.commands.sampleCommand">
+            name="Find errors"
+            id="master.thesis.eclipse.plugin.commands.errorFinderCommand">
       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
       <handler
             class="master.thesis.eclipse.plugin.handlers.ErrorHandler"
-            commandId="master.thesis.eclipse.plugin.commands.sampleCommand">
+            commandId="master.thesis.eclipse.plugin.commands.errorFinderCommand">
       </handler>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
       <key
-            commandId="master.thesis.eclipse.plugin.commands.sampleCommand"
+            commandId="master.thesis.eclipse.plugin.commands.errorFinderCommand"
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             contextId="org.eclipse.ui.contexts.window"
             sequence="M1+6">
@@ -35,12 +35,12 @@
       <menuContribution
             locationURI="menu:org.eclipse.ui.main.menu?after=additions">
          <menu
-               id="master.thesis.eclipse.plugin.menus.sampleMenu"
-               label="Sample Menu"
+               id="master.thesis.eclipse.plugin.menus.errorFinderMenu"
+               label="Error finder"
                mnemonic="M">
             <command
-                  commandId="master.thesis.eclipse.plugin.commands.sampleCommand"
-                  id="master.thesis.eclipse.plugin.menus.sampleCommand"
+                  commandId="master.thesis.eclipse.plugin.commands.errorFinderCommand"
+                  id="master.thesis.eclipse.plugin.menus.errorFinderCommand"
                   mnemonic="S">
             </command>
          </menu>
@@ -48,12 +48,12 @@
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
          <toolbar
-               id="master.thesis.eclipse.plugin.toolbars.sampleToolbar">
+               id="master.thesis.eclipse.plugin.toolbars.errorFinderToolbar">
             <command
-                  id="master.thesis.eclipse.plugin.toolbars.sampleCommand"
-                  commandId="master.thesis.eclipse.plugin.commands.sampleCommand"
+                  id="master.thesis.eclipse.plugin.toolbars.errorFinderCommand"
+                  commandId="master.thesis.eclipse.plugin.commands.errorFinderCommand"
                   icon="icons/sample.png"
-                  tooltip="Say hello world">
+                  tooltip="Find errors">
             </command>
          </toolbar>
       </menuContribution>
