@@ -25,17 +25,22 @@ package analyse;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.EmptyStatement;
+import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.InfixExpression.Operator;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import errors.BaseError;
@@ -52,6 +57,25 @@ public class CodeAnalyser extends ASTVisitor {
 	
 	private ArrayList<BaseError> errors = new ArrayList<>();
 
+	@Override
+	public boolean visit(final TypeDeclaration declaration) {
+		if (declaration.resolveBinding().isClass()) {
+			List<BodyDeclaration> body = declaration.bodyDeclarations();
+			if (body.isEmpty()) {
+				System.out.println("Methods missing!!");
+			} else {
+				for (BodyDeclaration decl : body) {
+					if (decl instanceof MethodDeclaration) {
+						IMethodBinding binding = ((MethodDeclaration) decl).resolveBinding();
+						if (binding.getName().equals("equals")) {
+							System.out.print("Equals exist!!");
+						}
+					}
+				}
+			}
+		}
+		return super.visit(declaration);
+	}
 	
 	@Override 
 	public boolean visit(final MethodInvocation method) {
