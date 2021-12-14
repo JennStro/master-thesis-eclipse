@@ -30,7 +30,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 public class Parser {
 	
 	public static CompilationUnit createAST(IFile file) {
-		ASTParser parser = ASTParser.newParser(AST.JLS16);
+		ASTParser parser = ASTParser.newParser(AST.JLS17);
 		parser.setSource(JavaCore.createCompilationUnitFrom(file));
 		parser.setResolveBindings(true);
 		CompilationUnit ast = (CompilationUnit) parser.createAST(null);

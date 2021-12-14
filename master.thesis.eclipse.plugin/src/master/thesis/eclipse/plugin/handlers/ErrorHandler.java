@@ -25,6 +25,7 @@ public class ErrorHandler extends AbstractHandler {
 		Editor.updateEditor();
 		
 		IFile theFile = Editor.getSelectedFile();
+		Editor.getProjectFiles();
 		CompilationUnit ast = (CompilationUnit) Parser.createAST(theFile);
 		CodeAnalyser analyser = new CodeAnalyser();
 		ast.accept(analyser);

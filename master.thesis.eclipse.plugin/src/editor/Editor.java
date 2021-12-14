@@ -35,7 +35,14 @@
 
 package editor;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.IEditorPart;
@@ -76,6 +83,31 @@ public class Editor {
 	public static IFile getSelectedFile() {
 		IFileEditorInput input = (IFileEditorInput) editor.getEditorInput();
 		return input.getFile();
+	}
+	
+	public static List<IFile> getProjectFiles() {
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		try {
+			IProject project = workspace.getRoot().getProject();
+			if (project == null) {
+				IProject activeProject = editor.getEditorInput().getAdapter(IProject.class);
+				if (activeProject != null) {
+					project = activeProject;
+				} else {
+					IResource res = editor.getEditorInput().getAdapter(IResource.class);
+					IProject activeProjectFromResource = res.getProject();
+					project = activeProjectFromResource;
+				}
+			}
+			if (project != null && project.isOpen()) {
+				for (IResource res : project.members()) {
+					System.out.println(res);
+				}
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	public static IWorkbenchPage getPage() {

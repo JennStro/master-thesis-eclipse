@@ -61,17 +61,28 @@ public class CodeAnalyser extends ASTVisitor {
 	public boolean visit(final TypeDeclaration declaration) {
 		if (declaration.resolveBinding().isClass()) {
 			List<BodyDeclaration> body = declaration.bodyDeclarations();
+			boolean hasEqualsMethod = false;
+			boolean overridesEqualMethod = false;
 			if (body.isEmpty()) {
 				System.out.println("Methods missing!!");
 			} else {
 				for (BodyDeclaration decl : body) {
 					if (decl instanceof MethodDeclaration) {
 						IMethodBinding binding = ((MethodDeclaration) decl).resolveBinding();
-						if (binding.getName().equals("equals")) {
+						boolean methodIsEqualsMethod = binding.getName().equals("equals") && binding.getReturnType().getName().equals("boolean") && binding.getParameterTypes().length == 1 && binding.getParameterTypes()[0].getName().equals("Object");
+						if (methodIsEqualsMethod) {
 							System.out.print("Equals exist!!");
+							hasEqualsMethod = true;
+							if (!(binding.getAnnotations().length < 1) && binding.getAnnotations()[0].getName().equals("Override")) {
+								System.out.println("And override....");
+								overridesEqualMethod = true;
+							}
 						}
 					}
 				}
+			}
+			if (!hasEqualsMethod) {
+				
 			}
 		}
 		return super.visit(declaration);
