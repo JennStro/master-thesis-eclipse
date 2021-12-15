@@ -23,6 +23,7 @@ public class ErrorHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		// Update editor to get possible other file in focus
 		Editor.updateEditor();
+		Editor.clearConsole();
 		
 		IFile theFile = Editor.getSelectedFile();
 		
@@ -33,10 +34,13 @@ public class ErrorHandler extends AbstractHandler {
 			ast.accept(analyser);
 			ArrayList<BaseError> errors = analyser.getErrors();
 			
-			Editor.printToConsole(file.getName());
 			
-			for (BaseError error : errors) {
+			if (!errors.isEmpty()) {
+				Editor.printToConsole(file.getName());
+				BaseError error = errors.get(0);
 				Editor.printToConsole(error.getWhat());
+				Editor.openFile(file);
+				Editor.findAndMarkText(error.getOffset(), error.getLength());
 			}
 		}
 		

@@ -61,6 +61,7 @@ import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.IConsoleView;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 public class Editor {
@@ -90,30 +91,35 @@ public class Editor {
 	}
 	
 	public static ArrayList<IFile> getProjectFiles() {
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		try {
-			IProject project = workspace.getRoot().getProject();
-			if (project == null) {
-				IProject activeProject = editor.getEditorInput().getAdapter(IProject.class);
-				if (activeProject != null) {
-					project = activeProject;
-				} else {
-					IResource res = editor.getEditorInput().getAdapter(IResource.class);
-					IProject activeProjectFromResource = res.getProject();
-					project = activeProjectFromResource;
-				}
-			}
-			if (project != null && project.isOpen()) {
-				ResourceVisitor visitor = new ResourceVisitor();
+		IProject project = getProject();
+		if (project != null && project.isOpen()) {
+			ResourceVisitor visitor = new ResourceVisitor();
+			try {
 				project.accept(visitor);
-				System.out.println(visitor.getFiles());
-				return visitor.getFiles();
-				
+			} catch (CoreException e) {
+				e.printStackTrace();
 			}
-		} catch (CoreException e) {
-			e.printStackTrace();
+			System.out.println(visitor.getFiles());
+			return visitor.getFiles();
+			
 		}
 		return null;
+	}
+	
+	private static IProject getProject() {
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IProject project = workspace.getRoot().getProject();
+		if (project == null) {
+			IProject activeProject = editor.getEditorInput().getAdapter(IProject.class);
+			if (activeProject != null) {
+				project = activeProject;
+			} else {
+				IResource res = editor.getEditorInput().getAdapter(IResource.class);
+				IProject activeProjectFromResource = res.getProject();
+				project = activeProjectFromResource;
+			}
+		}
+		return project;
 	}
 	
 	public static IWorkbenchPage getPage() {
@@ -177,6 +183,14 @@ public class Editor {
 			e.printStackTrace();
 		}
 		return lineNumber;
+	}
+
+	public static void openFile(IFile file) {
+		try {
+			IDE.openEditor(getPage(), file);
+		} catch (PartInitException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
