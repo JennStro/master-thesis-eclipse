@@ -35,9 +35,13 @@
 
 package editor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
@@ -100,9 +104,11 @@ public class Editor {
 				}
 			}
 			if (project != null && project.isOpen()) {
-				for (IResource res : project.members()) {
-					System.out.println(res);
-				}
+				ResourceVisitor visitor = new ResourceVisitor();
+				project.accept(visitor);
+				System.out.println(visitor.getFiles());
+				
+				
 			}
 		} catch (CoreException e) {
 			e.printStackTrace();
