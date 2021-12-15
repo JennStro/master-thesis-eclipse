@@ -25,9 +25,8 @@ public class ErrorHandler extends AbstractHandler {
 		Editor.updateEditor();
 		Editor.clearConsole();
 		
-		IFile theFile = Editor.getSelectedFile();
-		
 		ArrayList<IFile> files = Editor.getProjectFiles();
+		
 		for (IFile file : files) {
 			CompilationUnit ast = (CompilationUnit) Parser.createAST(file);
 			CodeAnalyser analyser = new CodeAnalyser();
@@ -41,30 +40,11 @@ public class ErrorHandler extends AbstractHandler {
 				Editor.printToConsole(error.getWhat());
 				Editor.openFile(file);
 				Editor.findAndMarkText(error.getOffset(), error.getLength());
-			}
+				return null;
+			} 
 		}
 		
-		
-//		CompilationUnit ast = (CompilationUnit) Parser.createAST(theFile);
-//		CodeAnalyser analyser = new CodeAnalyser();
-//		ast.accept(analyser);
-//		ArrayList<BaseError> errors = analyser.getErrors();
-//		
-//		int totalErrors = errors.size();
-//		
-//		if (!errors.isEmpty()) {
-//			
-//			BaseError error = errors.get(0);
-//			
-//			
-//			Editor.findAndMarkText(error.getOffset(), error.getLength());
-//			
-//			Editor.printToConsole(error.getWhat());
-//			errors.remove(0);
-//			
-//		} else {
-//			Editor.printToConsole("Found no errors!");
-//		}
+		Editor.printToConsole("Found no errors!");
 		
 		return null;
 	}
