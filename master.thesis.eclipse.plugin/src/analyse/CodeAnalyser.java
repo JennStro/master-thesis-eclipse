@@ -48,6 +48,7 @@ import errors.BitwiseOperatorError;
 import errors.EqualsOperatorError;
 import errors.IfWithoutBracketsError;
 import errors.IgnoringReturnError;
+import errors.MissingEqualsMethodError;
 import errors.SemiColonAfterIfError;
 import errors.StaticAsNormalError;
 
@@ -64,17 +65,15 @@ public class CodeAnalyser extends ASTVisitor {
 			boolean hasEqualsMethod = false;
 			boolean overridesEqualMethod = false;
 			if (body.isEmpty()) {
-				System.out.println("Methods missing!!");
+				errors.add(new MissingEqualsMethodError(declaration.getStartPosition(), declaration.getLength()));
 			} else {
 				for (BodyDeclaration decl : body) {
 					if (decl instanceof MethodDeclaration) {
 						IMethodBinding binding = ((MethodDeclaration) decl).resolveBinding();
 						boolean methodIsEqualsMethod = binding.getName().equals("equals") && binding.getReturnType().getName().equals("boolean") && binding.getParameterTypes().length == 1 && binding.getParameterTypes()[0].getName().equals("Object");
 						if (methodIsEqualsMethod) {
-							System.out.print("Equals exist!!");
 							hasEqualsMethod = true;
 							if (!(binding.getAnnotations().length < 1) && binding.getAnnotations()[0].getName().equals("Override")) {
-								System.out.println("And override....");
 								overridesEqualMethod = true;
 							}
 						}
@@ -82,7 +81,7 @@ public class CodeAnalyser extends ASTVisitor {
 				}
 			}
 			if (!hasEqualsMethod) {
-				
+				errors.add(new MissingEqualsMethodError(declaration.getStartPosition(), declaration.getLength()));
 			}
 		}
 		return super.visit(declaration);
