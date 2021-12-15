@@ -25,27 +25,42 @@ public class ErrorHandler extends AbstractHandler {
 		Editor.updateEditor();
 		
 		IFile theFile = Editor.getSelectedFile();
-		Editor.getProjectFiles();
-		CompilationUnit ast = (CompilationUnit) Parser.createAST(theFile);
-		CodeAnalyser analyser = new CodeAnalyser();
-		ast.accept(analyser);
-		ArrayList<BaseError> errors = analyser.getErrors();
 		
-		int totalErrors = errors.size();
-		
-		if (!errors.isEmpty()) {
+		ArrayList<IFile> files = Editor.getProjectFiles();
+		for (IFile file : files) {
+			CompilationUnit ast = (CompilationUnit) Parser.createAST(file);
+			CodeAnalyser analyser = new CodeAnalyser();
+			ast.accept(analyser);
+			ArrayList<BaseError> errors = analyser.getErrors();
 			
-			BaseError error = errors.get(0);
+			Editor.printToConsole(file.getName());
 			
-			
-			Editor.findAndMarkText(error.getOffset(), error.getLength());
-			
-			Editor.printToConsole(error.getWhat());
-			errors.remove(0);
-			
-		} else {
-			Editor.printToConsole("Found no errors!");
+			for (BaseError error : errors) {
+				Editor.printToConsole(error.getWhat());
+			}
 		}
+		
+		
+//		CompilationUnit ast = (CompilationUnit) Parser.createAST(theFile);
+//		CodeAnalyser analyser = new CodeAnalyser();
+//		ast.accept(analyser);
+//		ArrayList<BaseError> errors = analyser.getErrors();
+//		
+//		int totalErrors = errors.size();
+//		
+//		if (!errors.isEmpty()) {
+//			
+//			BaseError error = errors.get(0);
+//			
+//			
+//			Editor.findAndMarkText(error.getOffset(), error.getLength());
+//			
+//			Editor.printToConsole(error.getWhat());
+//			errors.remove(0);
+//			
+//		} else {
+//			Editor.printToConsole("Found no errors!");
+//		}
 		
 		return null;
 	}

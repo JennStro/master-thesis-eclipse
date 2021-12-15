@@ -15,7 +15,11 @@ public class ResourceVisitor implements IResourceVisitor {
 	public boolean visit(IResource resource) throws CoreException {
 		System.out.println(resource);
 		if (resource.getType() == IResource.FILE) {
-			files.add((IFile) resource);
+			IFile file = (IFile) resource;
+			if (file.getFileExtension().equals("java")) {
+				files.add(file);
+			}
+			
 			return false;
 		}
 		return true;

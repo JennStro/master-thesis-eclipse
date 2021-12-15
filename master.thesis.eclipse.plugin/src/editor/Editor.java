@@ -89,7 +89,7 @@ public class Editor {
 		return input.getFile();
 	}
 	
-	public static List<IFile> getProjectFiles() {
+	public static ArrayList<IFile> getProjectFiles() {
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		try {
 			IProject project = workspace.getRoot().getProject();
@@ -107,7 +107,7 @@ public class Editor {
 				ResourceVisitor visitor = new ResourceVisitor();
 				project.accept(visitor);
 				System.out.println(visitor.getFiles());
-				
+				return visitor.getFiles();
 				
 			}
 		} catch (CoreException e) {
@@ -143,10 +143,10 @@ public class Editor {
 	 */
 	public static void printToConsole(String text) {
 		MessageConsole myConsole = findConsole("Errors");
-		myConsole.clearConsole();
 		MessageConsoleStream out = myConsole.newMessageStream();
 		
 		out.print(text);
+		out.println();
 		
 		IWorkbenchPage page = Editor.getPage();
 		String id = IConsoleConstants.ID_CONSOLE_VIEW;
@@ -157,6 +157,11 @@ public class Editor {
 		} catch (PartInitException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void clearConsole() {
+		MessageConsole myConsole = findConsole("Errors");
+		myConsole.clearConsole();
 	}
 	
 	public static void findAndMarkText(int start, int length) {
