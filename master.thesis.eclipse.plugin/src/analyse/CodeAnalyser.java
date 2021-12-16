@@ -27,11 +27,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
+import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.EmptyStatement;
+import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
@@ -40,12 +43,14 @@ import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import errors.BaseError;
 import errors.BitwiseOperatorError;
 import errors.EqualsOperatorError;
+import errors.FieldDeclarationWithoutInitializerError;
 import errors.IfWithoutBracketsError;
 import errors.IgnoringReturnError;
 import errors.MissingEqualsMethodError;
@@ -58,6 +63,9 @@ public class CodeAnalyser extends ASTVisitor {
 	
 	private ArrayList<BaseError> errors = new ArrayList<>();
 
+	/**
+	 * Check if a class is missing the equals-method.
+	 */
 	@Override
 	public boolean visit(final TypeDeclaration declaration) {
 		if (declaration.resolveBinding().isClass()) {
@@ -68,6 +76,7 @@ public class CodeAnalyser extends ASTVisitor {
 				errors.add(new MissingEqualsMethodError(declaration.getStartPosition(), declaration.getLength()));
 			} else {
 				for (BodyDeclaration decl : body) {
+					
 					if (decl instanceof MethodDeclaration) {
 						IMethodBinding binding = ((MethodDeclaration) decl).resolveBinding();
 						boolean methodIsEqualsMethod = binding.getName().equals("equals") && binding.getReturnType().getName().equals("boolean") && binding.getParameterTypes().length == 1 && binding.getParameterTypes()[0].getName().equals("Object");
@@ -78,6 +87,26 @@ public class CodeAnalyser extends ASTVisitor {
 							}
 						}
 					}
+					
+					if (decl instanceof FieldDeclaration) {
+						Object maybeChildren = decl.getStructuralProperty(FieldDeclaration.FRAGMENTS_PROPERTY);
+						System.out.println(maybeChildren);
+						
+						if (maybeChildren != null) {
+							List<ASTNode> children = (List<ASTNode>) maybeChildren;
+							System.out.println(children);
+							System.out.println(ASTNode.nodeClassForType(children.get(0).getNodeType()));
+							for (ASTNode child : children) {
+								if (child instanceof VariableDeclarationFragment) {
+									if (((VariableDeclarationFragment) child).getInitializer() == null) {
+										errors.add(new FieldDeclarationWithoutInitializerError(decl.getStartPosition(), decl.getLength()));
+									}
+								}
+							}
+						}
+							
+					}
+					
 				}
 			}
 			if (!hasEqualsMethod) {
@@ -165,6 +194,7 @@ public class CodeAnalyser extends ASTVisitor {
 		}
 		return super.visit(classInstanceCreation);
 	}
+
 	
 	
 	public ArrayList<BaseError> getErrors() {
