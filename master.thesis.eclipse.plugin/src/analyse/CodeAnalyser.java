@@ -1,5 +1,7 @@
 package analyse;
 
+import java.lang.reflect.Method;
+
 /*
  * 
  * This code is derived from the 
@@ -24,6 +26,7 @@ package analyse;
 
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -65,13 +68,30 @@ public class CodeAnalyser extends ASTVisitor {
 
 	/**
 	 * Check if a class is missing the equals-method.
+	 * Check for uninitialized fieldvariables.
 	 */
 	@Override
 	public boolean visit(final TypeDeclaration declaration) {
 		if (declaration.resolveBinding().isClass()) {
 			List<BodyDeclaration> body = declaration.bodyDeclarations();
+			
+			if(!declaration.resolveBinding().getSuperclass().getName().equals("Object")) {
+				
+				IMethodBinding[] superMethods = declaration.resolveBinding().getSuperclass().getDeclaredMethods();
+				System.out.println("Super:" + Arrays.toString(superMethods));
+				
+				for (IMethodBinding method : declaration.resolveBinding().getDeclaredMethods()) {
+					if (Arrays.asList(superMethods).contains(method)) {
+						System.out.println(method + " should be @override");
+					}
+				}
+			}
+			
+			
+			
 			boolean hasEqualsMethod = false;
 			boolean overridesEqualMethod = false;
+			
 			if (body.isEmpty()) {
 				errors.add(new MissingEqualsMethodError(declaration.getStartPosition(), declaration.getLength()));
 			} else {
@@ -112,6 +132,9 @@ public class CodeAnalyser extends ASTVisitor {
 			if (!hasEqualsMethod) {
 				errors.add(new MissingEqualsMethodError(declaration.getStartPosition(), declaration.getLength()));
 			}
+			
+			
+			
 		}
 		return super.visit(declaration);
 	}
