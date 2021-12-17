@@ -67,9 +67,11 @@ public class CodeAnalyser extends ASTVisitor {
 	 */
 	@Override
 	public boolean visit(final TypeDeclaration declaration) {
+		System.out.println(declaration);
+		System.out.println(declaration.resolveBinding());
 		if (declaration.resolveBinding().isClass()) {
 			List<BodyDeclaration> body = declaration.bodyDeclarations();
-			
+			System.out.println("Body: " + body);
 			boolean hasEqualsMethod = false;
 			boolean overridesEqualMethod = false;
 			
@@ -81,13 +83,20 @@ public class CodeAnalyser extends ASTVisitor {
 					
 					if (decl instanceof MethodDeclaration) {
 						IMethodBinding binding = ((MethodDeclaration) decl).resolveBinding();
-						boolean methodIsEqualsMethod = binding.getName().equals("equals") && binding.getReturnType().getName().equals("boolean") && binding.getParameterTypes().length == 1 && binding.getParameterTypes()[0].getName().equals("Object");
-						if (methodIsEqualsMethod) {
-							hasEqualsMethod = true;
-							if (!(binding.getAnnotations().length < 1) && binding.getAnnotations()[0].getName().equals("Override")) {
-								overridesEqualMethod = true;
+						System.out.println("MethodDecl: " +decl);
+						System.out.println("MethodDeclBind: " +binding);
+						if (((MethodDeclaration) decl).isConstructor()) {
+							System.out.println("Found constructor!!!!!");
+						} else {
+							boolean methodIsEqualsMethod = binding.getName().equals("equals") && binding.getReturnType().getName().equals("boolean") && binding.getParameterTypes().length == 1 && binding.getParameterTypes()[0].getName().equals("Object");
+							if (methodIsEqualsMethod) {
+								hasEqualsMethod = true;
+								if (!(binding.getAnnotations().length < 1) && binding.getAnnotations()[0].getName().equals("Override")) {
+									overridesEqualMethod = true;
+								}
 							}
 						}
+						
 					}
 					
 					if (decl instanceof FieldDeclaration) {
@@ -207,7 +216,9 @@ public class CodeAnalyser extends ASTVisitor {
 	public boolean visit(final ClassInstanceCreation classInstanceCreation) {
 		if (classInstanceCreation.getParent().getNodeType() == ASTNode.VARIABLE_DECLARATION_FRAGMENT) {
 			VariableDeclarationFragment varDecl = (VariableDeclarationFragment) classInstanceCreation.getParent();
-			classInstances.put(varDecl.getName().getIdentifier(), classInstanceCreation.resolveTypeBinding().getName());
+			if (classInstanceCreation.resolveTypeBinding() != null) {
+				classInstances.put(varDecl.getName().getIdentifier(), classInstanceCreation.resolveTypeBinding().getName());
+			}
 		}
 		return super.visit(classInstanceCreation);
 	}

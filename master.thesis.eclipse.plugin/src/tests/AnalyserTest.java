@@ -23,7 +23,10 @@
 package tests;
 
 import java.util.ArrayList;
+import java.util.Map;
 
+import org.eclipse.jdt.core.IClassFile;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -33,6 +36,7 @@ import org.junit.jupiter.api.Test;
 
 import analyse.CodeAnalyser;
 import errors.BaseError;
+import errors.FieldDeclarationWithoutInitializerError;
 import errors.MissingEqualsMethodError;
 
 public class AnalyserTest {
@@ -67,17 +71,91 @@ public class AnalyserTest {
 	}
 	
 	@Test 
-	public void classNotImplementingEqualsMethod() {
+	public void emptyClassNotImplementingEqualsMethod() {
 		String emptyClass = "public class Main {}";
 		parser.setSource(emptyClass.toCharArray());
 		CompilationUnit ast = (CompilationUnit) parser.createAST(null);
 		ast.accept(analyser);
 		
 		ArrayList<BaseError> errors =  analyser.getErrors();
-		System.out.println(errors);
 		Assertions.assertEquals(1, errors.size());
 		Assertions.assertTrue(errors.get(0) instanceof MissingEqualsMethodError);
+	}
+	
+	@Test 
+	public void classNotImplementingEqualsMethod() {
+		String classWithMethods = "public class Main {"
+				+ "		public void method() {}"
+				+ "}";
+		parser.setSource(classWithMethods.toCharArray());
+		CompilationUnit ast = (CompilationUnit) parser.createAST(null);
+		ast.accept(analyser);
 		
+		ArrayList<BaseError> errors =  analyser.getErrors();
+		Assertions.assertEquals(1, errors.size());
+		Assertions.assertTrue(errors.get(0) instanceof MissingEqualsMethodError);
+	}
+	
+	@Test 
+	public void classImplementingEqualsMethod() {
+		String classWithMethods = "public class Main {"
+				+ "		public void method() {}"
+				+ "		public boolean equals(Object o) {return false;}"
+				+ "}";
+		parser.setSource(classWithMethods.toCharArray());
+		CompilationUnit ast = (CompilationUnit) parser.createAST(null);
+		ast.accept(analyser);
+		
+		ArrayList<BaseError> errors =  analyser.getErrors();
+		Assertions.assertEquals(0, errors.size());
+	}
+	
+	@Test 
+	public void classNotInititializingFieldNoConstructor() {
+		String classWithMethods = "public class Main {"
+				+ "		ArrayList<Integer> list;"
+				+ "		public boolean equals(Object o) {return false;}"
+				+ "}";
+		parser.setSource(classWithMethods.toCharArray());
+		CompilationUnit ast = (CompilationUnit) parser.createAST(null);
+		ast.accept(analyser);
+		
+		ArrayList<BaseError> errors =  analyser.getErrors();
+		Assertions.assertEquals(1, errors.size());
+		Assertions.assertTrue(errors.get(0) instanceof FieldDeclarationWithoutInitializerError);
+	}
+	
+	@Test 
+	public void classInititializingFieldNoConstructor() {
+		String classWithMethods = "public class Main {"
+				+ "		ArrayList<Integer> list = new ArrayList<>();"
+				+ "		public boolean equals(Object o) {return false;}"
+				+ "}";
+		parser.setSource(classWithMethods.toCharArray());
+		CompilationUnit ast = (CompilationUnit) parser.createAST(null);
+		ast.accept(analyser);
+		
+		ArrayList<BaseError> errors =  analyser.getErrors();
+		Assertions.assertEquals(0, errors.size());
+	}
+	
+	@Test 
+	public void classInititializingFieldInConstructor() {
+		String classWithMethods = "public class Main {"
+				+ "		ArrayList<Integer> list;"
+				
+				+ "		public Main(ArrayList<Integer> list) {"
+				+ "			this.list = list;"
+				+ "		}"
+				
+				+ "		public boolean equals(Object o) {return false;}"
+				+ "}";
+		parser.setSource(classWithMethods.toCharArray());
+		CompilationUnit ast = (CompilationUnit) parser.createAST(null);
+		ast.accept(analyser);
+		
+		ArrayList<BaseError> errors =  analyser.getErrors();
+		Assertions.assertEquals(0, errors.size());
 	}
 	
 }
