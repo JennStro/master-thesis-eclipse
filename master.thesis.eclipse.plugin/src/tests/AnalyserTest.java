@@ -177,4 +177,24 @@ public class AnalyserTest {
 		Assertions.assertEquals(0, errors.size());
 	}
 	
+	@Test 
+	public void classNotInititializingFieldInConstructor() {
+		String classWithMethods = "public class Main {"
+				+ "		ArrayList<Integer> list;"
+				
+				+ "		public Main(ArrayList<Integer> list) {"
+				+ ""
+				+ "		}"
+				
+				+ "		public boolean equals(Object o) {return false;}"
+				+ "}";
+		parser.setSource(classWithMethods.toCharArray());
+		CompilationUnit ast = (CompilationUnit) parser.createAST(null);
+		ast.accept(analyser);
+		
+		ArrayList<BaseError> errors =  analyser.getErrors();
+		Assertions.assertEquals(1, errors.size());
+		Assertions.assertTrue(errors.get(0) instanceof FieldDeclarationWithoutInitializerError);
+	}
+	
 }

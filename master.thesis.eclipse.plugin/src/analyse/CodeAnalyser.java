@@ -128,33 +128,37 @@ public class CodeAnalyser extends ASTVisitor {
 		return super.visit(declaration);
 	}
 	
+	/**
+	 * 
+	 * @param methods the methods of the class
+	 * @param field the field that should be initialized
+	 * @return true if the field is initialized in the constructor of the class
+	 */
 	private boolean fieldIsInitializedInConstructor(MethodDeclaration[] methods, VariableDeclarationFragment field) {
 		for (MethodDeclaration method : methods) {
 			
 			if (((MethodDeclaration) method).isConstructor()) {
 				Block constructorBody = (Block) method.getStructuralProperty(MethodDeclaration.BODY_PROPERTY);
-				List<ASTNode> statements = (List<ASTNode>) constructorBody.getStructuralProperty(Block.STATEMENTS_PROPERTY);
 				
+				List<ASTNode> statements = (List<ASTNode>) constructorBody.getStructuralProperty(Block.STATEMENTS_PROPERTY);
 				for (ASTNode statement : statements) {
 					if (statement instanceof ExpressionStatement) {
+						
 						ASTNode assignment = (ASTNode) statement.getStructuralProperty(ExpressionStatement.EXPRESSION_PROPERTY);
 						if (assignment instanceof Assignment) {
 							
-							if (((Assignment) assignment).getLeftHandSide() instanceof FieldAccess) {
+							ASTNode leftHandSide = ((Assignment) assignment).getLeftHandSide();
+							
+							if (leftHandSide instanceof FieldAccess) {
 								FieldAccess fieldAccess = (FieldAccess) ((Assignment) assignment).getLeftHandSide();
-								
 								String accessedField = fieldAccess.getName().getIdentifier();
-								
 								if (field.getName().getIdentifier().equals(accessedField)) {
 									return true;
 								}
 							} 
 							
-							if (((Assignment) assignment).getLeftHandSide() instanceof SimpleName) {
-								SimpleName fieldAccess = (SimpleName) ((Assignment) assignment).getLeftHandSide();
-								
-								String accessedField = fieldAccess.getIdentifier();
-								
+							if (leftHandSide instanceof SimpleName) {
+								SimpleName fieldAccess = (SimpleName) ((Assignment) assignment).getLeftHandSide();String accessedField = fieldAccess.getIdentifier();
 								if (field.getName().getIdentifier().equals(accessedField)) {
 									return true;
 								}
