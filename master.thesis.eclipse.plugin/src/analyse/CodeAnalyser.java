@@ -1,7 +1,5 @@
 package analyse;
 
-import java.lang.reflect.Method;
-
 /*
  * 
  * This code is derived from the 
@@ -25,16 +23,13 @@ import java.lang.reflect.Method;
 
 
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.ArrayList;	
 import java.util.HashMap;
 import java.util.List;
 
-import org.eclipse.jdt.core.dom.ASTMatcher;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
-import org.eclipse.jdt.core.dom.ChildListPropertyDescriptor;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.EmptyStatement;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
@@ -46,7 +41,6 @@ import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.StructuralPropertyDescriptor;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
@@ -67,27 +61,14 @@ public class CodeAnalyser extends ASTVisitor {
 	private ArrayList<BaseError> errors = new ArrayList<>();
 
 	/**
-	 * Check if a class is missing the equals-method.
-	 * Check for uninitialized fieldvariables.
+	 * Goes through a class to check:
+	 *   *  if a class is missing the equals-method.
+	 * 	 *  uninitialized fieldvariables.
 	 */
 	@Override
 	public boolean visit(final TypeDeclaration declaration) {
 		if (declaration.resolveBinding().isClass()) {
 			List<BodyDeclaration> body = declaration.bodyDeclarations();
-			
-			if(!declaration.resolveBinding().getSuperclass().getName().equals("Object")) {
-				
-				IMethodBinding[] superMethods = declaration.resolveBinding().getSuperclass().getDeclaredMethods();
-				System.out.println("Super:" + Arrays.toString(superMethods));
-				
-				for (IMethodBinding method : declaration.resolveBinding().getDeclaredMethods()) {
-					if (Arrays.asList(superMethods).contains(method)) {
-						System.out.println(method + " should be @override");
-					}
-				}
-			}
-			
-			
 			
 			boolean hasEqualsMethod = false;
 			boolean overridesEqualMethod = false;
@@ -110,12 +91,9 @@ public class CodeAnalyser extends ASTVisitor {
 					
 					if (decl instanceof FieldDeclaration) {
 						Object maybeChildren = decl.getStructuralProperty(FieldDeclaration.FRAGMENTS_PROPERTY);
-						System.out.println(maybeChildren);
 						
 						if (maybeChildren != null) {
 							List<ASTNode> children = (List<ASTNode>) maybeChildren;
-							System.out.println(children);
-							System.out.println(ASTNode.nodeClassForType(children.get(0).getNodeType()));
 							for (ASTNode child : children) {
 								if (child instanceof VariableDeclarationFragment) {
 									if (((VariableDeclarationFragment) child).getInitializer() == null) {
@@ -139,6 +117,11 @@ public class CodeAnalyser extends ASTVisitor {
 		return super.visit(declaration);
 	}
 	
+	/**
+	 * When a method is called, check if
+	 *   * The method is used if it is non-void and non-boolean
+	 *   * If the method is static and called on an object
+	 */
 	@Override 
 	public boolean visit(final MethodInvocation method) {
 		if (!(methodReturnsVoid(method) || methodReturnsBoolean(method))) {
@@ -178,6 +161,11 @@ public class CodeAnalyser extends ASTVisitor {
 		return method.resolveMethodBinding().getReturnType().getName().equals("boolean");
 	}
 	
+	/**
+	 * In a binaryexpression, check if:
+	 * 	* binary operators are being used
+	 * 	* equals operator are being used on objects
+	 */
 	@Override 
 	public boolean visit(final InfixExpression expression) {
 		if (expression.getOperator() == Operator.AND || expression.getOperator() == Operator.OR) {
@@ -187,8 +175,6 @@ public class CodeAnalyser extends ASTVisitor {
 			} 
 		}
 		if (expression.getOperator() == Operator.EQUALS && !expression.getLeftOperand().resolveTypeBinding().isPrimitive() && !expression.getRightOperand().resolveTypeBinding().isPrimitive() && !expression.getRightOperand().resolveTypeBinding().getName().equals("null")) {
-			System.out.println("Type " + expression.getRightOperand().resolveTypeBinding().getName());
-			System.out.println("Type " + expression.getLeftOperand().resolveTypeBinding().getName());
 			if (!(expression.getLeftOperand().getNodeType() == ASTNode.STRING_LITERAL && expression.getRightOperand().getNodeType() == ASTNode.STRING_LITERAL)) {
 				errors.add(new EqualsOperatorError(expression.getStartPosition(), expression.getLength()));
 				String suggestion = "You should try \n "+ expression.getLeftOperand().toString() + ".equals("+ expression.getRightOperand().toString()  +")";
@@ -197,6 +183,11 @@ public class CodeAnalyser extends ASTVisitor {
 		return super.visit(expression);
 	}
 	
+	/**
+	 * In an if-statement check if:
+	 * 	* Semicolon after if-statement 
+	 * 	* The if-statement has blocks around the body
+	 */
 	@Override 
 	public boolean visit(final IfStatement ifStatement) {
 		if (ifStatement.getThenStatement() instanceof EmptyStatement) {
