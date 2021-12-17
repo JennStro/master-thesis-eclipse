@@ -29,11 +29,16 @@ import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.BodyDeclaration;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.EmptyStatement;
+import org.eclipse.jdt.core.dom.ExpressionStatement;
+import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -41,6 +46,7 @@ import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
@@ -90,7 +96,9 @@ public class CodeAnalyser extends ASTVisitor {
 						for (ASTNode child : children) {
 							if (child instanceof VariableDeclarationFragment) {
 								if (((VariableDeclarationFragment) child).getInitializer() == null) {
-									errors.add(new FieldDeclarationWithoutInitializerError(field.getStartPosition(), field.getLength()));
+									if (!fieldIsInitializedInConstructor(methods, (VariableDeclarationFragment) child)) {
+										errors.add(new FieldDeclarationWithoutInitializerError(field.getStartPosition(), field.getLength()));
+									}
 								}
 							}
 						}
@@ -125,13 +133,39 @@ public class CodeAnalyser extends ASTVisitor {
 		return super.visit(declaration);
 	}
 	
-	private boolean fieldIsInitializedInConstructor(MethodDeclaration constructor, FieldDeclaration field) {
-		if (((MethodDeclaration) constructor).isConstructor()) {
-		
-			ASTNode constructorBody = (ASTNode) constructor.getStructuralProperty(MethodDeclaration.BODY_PROPERTY);
-			System.out.println("con: " +constructorBody);
-			System.out.println(ASTNode.nodeClassForType(constructorBody.getNodeType()));
+	private boolean fieldIsInitializedInConstructor(MethodDeclaration[] methods, VariableDeclarationFragment field) {
+		for (MethodDeclaration method : methods) {
+			if (((MethodDeclaration) method).isConstructor()) {
+				Block constructorBody = (Block) method.getStructuralProperty(MethodDeclaration.BODY_PROPERTY);
+				System.out.println("con: " +constructorBody);
+				System.out.println(ASTNode.nodeClassForType(constructorBody.getNodeType()));
+				System.out.println(constructorBody.getStructuralProperty(Block.STATEMENTS_PROPERTY));
+				List<ASTNode> statements = (List<ASTNode>) constructorBody.getStructuralProperty(Block.STATEMENTS_PROPERTY);
+				for (ASTNode statement : statements) {
+					System.out.println(ASTNode.nodeClassForType(statement.getNodeType()));
+					if (statement instanceof ExpressionStatement) {
+						ASTNode assignment = (ASTNode) statement.getStructuralProperty(ExpressionStatement.EXPRESSION_PROPERTY);
+						System.out.println(ASTNode.nodeClassForType(assignment.getNodeType()));
+						System.out.println(statement.getStructuralProperty(ExpressionStatement.EXPRESSION_PROPERTY));
+						if (assignment instanceof Assignment) {
+							System.out.println(((Assignment) assignment).getLeftHandSide());
+							System.out.println(ASTNode.nodeClassForType(((Assignment) assignment).getLeftHandSide() .getNodeType()));
+							if (((Assignment) assignment).getLeftHandSide() instanceof FieldAccess) {
+								System.out.println("Hi");
+								FieldAccess fieldAccess = (FieldAccess) ((Assignment) assignment).getLeftHandSide();
+								
+								String accessedField = fieldAccess.getName().getIdentifier();
+								
+								if (field.getName().getIdentifier().equals(accessedField)) {
+									return true;
+								}
+							}
+						}
+					}
+				}
+			}
 		}
+		
 		return false;
 	}
 	
