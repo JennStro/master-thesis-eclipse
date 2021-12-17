@@ -79,43 +79,41 @@ public class CodeAnalyser extends ASTVisitor {
 				errors.add(new MissingEqualsMethodError(declaration.getStartPosition(), declaration.getLength()));
 				return super.visit(declaration);
 			} else {
-				for (BodyDeclaration decl : body) {
+				FieldDeclaration[] fields = declaration.getFields();
+				MethodDeclaration[] methods = declaration.getMethods();
+				
+				for (FieldDeclaration field : fields) {
+					Object maybeChildren = field.getStructuralProperty(FieldDeclaration.FRAGMENTS_PROPERTY);
 					
-					if (decl instanceof MethodDeclaration) {
-						IMethodBinding binding = ((MethodDeclaration) decl).resolveBinding();
-						System.out.println("MethodDecl: " +decl);
-						System.out.println("MethodDeclBind: " +binding);
-						if (((MethodDeclaration) decl).isConstructor()) {
-							System.out.println("Found constructor!!!!!");
-						} else {
-							boolean methodIsEqualsMethod = binding.getName().equals("equals") && binding.getReturnType().getName().equals("boolean") && binding.getParameterTypes().length == 1 && binding.getParameterTypes()[0].getName().equals("Object");
-							if (methodIsEqualsMethod) {
-								hasEqualsMethod = true;
-								if (!(binding.getAnnotations().length < 1) && binding.getAnnotations()[0].getName().equals("Override")) {
-									overridesEqualMethod = true;
+					if (maybeChildren != null) {
+						List<ASTNode> children = (List<ASTNode>) maybeChildren;
+						for (ASTNode child : children) {
+							if (child instanceof VariableDeclarationFragment) {
+								if (((VariableDeclarationFragment) child).getInitializer() == null) {
+									errors.add(new FieldDeclarationWithoutInitializerError(field.getStartPosition(), field.getLength()));
 								}
 							}
 						}
-						
 					}
-					
-					if (decl instanceof FieldDeclaration) {
-						Object maybeChildren = decl.getStructuralProperty(FieldDeclaration.FRAGMENTS_PROPERTY);
-						
-						if (maybeChildren != null) {
-							List<ASTNode> children = (List<ASTNode>) maybeChildren;
-							for (ASTNode child : children) {
-								if (child instanceof VariableDeclarationFragment) {
-									if (((VariableDeclarationFragment) child).getInitializer() == null) {
-										errors.add(new FieldDeclarationWithoutInitializerError(decl.getStartPosition(), decl.getLength()));
-									}
-								}
+				}
+				
+				for (MethodDeclaration method : methods) {
+					IMethodBinding binding = ((MethodDeclaration) method).resolveBinding();
+					System.out.println("MethodDecl: " +method);
+					System.out.println("MethodDeclBind: " +binding);
+					if (!((MethodDeclaration) method).isConstructor()) {
+						boolean methodIsEqualsMethod = binding.getName().equals("equals") && binding.getReturnType().getName().equals("boolean") && binding.getParameterTypes().length == 1 && binding.getParameterTypes()[0].getName().equals("Object");
+						if (methodIsEqualsMethod) {
+							hasEqualsMethod = true;
+							if (!(binding.getAnnotations().length < 1) && binding.getAnnotations()[0].getName().equals("Override")) {
+								overridesEqualMethod = true;
 							}
+						
 						}
-							
 					}
 					
 				}
+					
 			}
 			if (!hasEqualsMethod) {
 				errors.add(new MissingEqualsMethodError(declaration.getStartPosition(), declaration.getLength()));
@@ -125,6 +123,16 @@ public class CodeAnalyser extends ASTVisitor {
 			
 		}
 		return super.visit(declaration);
+	}
+	
+	private boolean fieldIsInitializedInConstructor(MethodDeclaration constructor, FieldDeclaration field) {
+		if (((MethodDeclaration) constructor).isConstructor()) {
+		
+			ASTNode constructorBody = (ASTNode) constructor.getStructuralProperty(MethodDeclaration.BODY_PROPERTY);
+			System.out.println("con: " +constructorBody);
+			System.out.println(ASTNode.nodeClassForType(constructorBody.getNodeType()));
+		}
+		return false;
 	}
 	
 	/**
