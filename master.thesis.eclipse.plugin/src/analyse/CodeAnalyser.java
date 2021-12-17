@@ -75,6 +75,7 @@ public class CodeAnalyser extends ASTVisitor {
 			
 			if (body.isEmpty()) {
 				errors.add(new MissingEqualsMethodError(declaration.getStartPosition(), declaration.getLength()));
+				return super.visit(declaration);
 			} else {
 				for (BodyDeclaration decl : body) {
 					
@@ -192,10 +193,12 @@ public class CodeAnalyser extends ASTVisitor {
 	public boolean visit(final IfStatement ifStatement) {
 		if (ifStatement.getThenStatement() instanceof EmptyStatement) {
 			errors.add(new SemiColonAfterIfError(ifStatement.getStartPosition(), ifStatement.getLength()));
+			return super.visit(ifStatement);
 			
 		}
 		if (!(ifStatement.getThenStatement().getNodeType() == ASTNode.BLOCK)) {
 			errors.add(new IfWithoutBracketsError(ifStatement.getStartPosition(), ifStatement.getLength()));
+			return super.visit(ifStatement);
 		}
 		return super.visit(ifStatement);
 	}
