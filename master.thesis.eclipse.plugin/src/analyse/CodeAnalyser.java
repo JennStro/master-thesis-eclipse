@@ -73,11 +73,8 @@ public class CodeAnalyser extends ASTVisitor {
 	 */
 	@Override
 	public boolean visit(final TypeDeclaration declaration) {
-		System.out.println(declaration);
-		System.out.println(declaration.resolveBinding());
 		if (declaration.resolveBinding().isClass()) {
 			List<BodyDeclaration> body = declaration.bodyDeclarations();
-			System.out.println("Body: " + body);
 			boolean hasEqualsMethod = false;
 			boolean overridesEqualMethod = false;
 			
@@ -107,8 +104,6 @@ public class CodeAnalyser extends ASTVisitor {
 				
 				for (MethodDeclaration method : methods) {
 					IMethodBinding binding = ((MethodDeclaration) method).resolveBinding();
-					System.out.println("MethodDecl: " +method);
-					System.out.println("MethodDeclBind: " +binding);
 					if (!((MethodDeclaration) method).isConstructor()) {
 						boolean methodIsEqualsMethod = binding.getName().equals("equals") && binding.getReturnType().getName().equals("boolean") && binding.getParameterTypes().length == 1 && binding.getParameterTypes()[0].getName().equals("Object");
 						if (methodIsEqualsMethod) {
@@ -137,21 +132,12 @@ public class CodeAnalyser extends ASTVisitor {
 		for (MethodDeclaration method : methods) {
 			if (((MethodDeclaration) method).isConstructor()) {
 				Block constructorBody = (Block) method.getStructuralProperty(MethodDeclaration.BODY_PROPERTY);
-				System.out.println("con: " +constructorBody);
-				System.out.println(ASTNode.nodeClassForType(constructorBody.getNodeType()));
-				System.out.println(constructorBody.getStructuralProperty(Block.STATEMENTS_PROPERTY));
 				List<ASTNode> statements = (List<ASTNode>) constructorBody.getStructuralProperty(Block.STATEMENTS_PROPERTY);
 				for (ASTNode statement : statements) {
-					System.out.println(ASTNode.nodeClassForType(statement.getNodeType()));
 					if (statement instanceof ExpressionStatement) {
 						ASTNode assignment = (ASTNode) statement.getStructuralProperty(ExpressionStatement.EXPRESSION_PROPERTY);
-						System.out.println(ASTNode.nodeClassForType(assignment.getNodeType()));
-						System.out.println(statement.getStructuralProperty(ExpressionStatement.EXPRESSION_PROPERTY));
 						if (assignment instanceof Assignment) {
-							System.out.println(((Assignment) assignment).getLeftHandSide());
-							System.out.println(ASTNode.nodeClassForType(((Assignment) assignment).getLeftHandSide() .getNodeType()));
 							if (((Assignment) assignment).getLeftHandSide() instanceof FieldAccess) {
-								System.out.println("Hi");
 								FieldAccess fieldAccess = (FieldAccess) ((Assignment) assignment).getLeftHandSide();
 								
 								String accessedField = fieldAccess.getName().getIdentifier();
