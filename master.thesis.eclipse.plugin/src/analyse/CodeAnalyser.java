@@ -130,17 +130,30 @@ public class CodeAnalyser extends ASTVisitor {
 	
 	private boolean fieldIsInitializedInConstructor(MethodDeclaration[] methods, VariableDeclarationFragment field) {
 		for (MethodDeclaration method : methods) {
+			
 			if (((MethodDeclaration) method).isConstructor()) {
 				Block constructorBody = (Block) method.getStructuralProperty(MethodDeclaration.BODY_PROPERTY);
 				List<ASTNode> statements = (List<ASTNode>) constructorBody.getStructuralProperty(Block.STATEMENTS_PROPERTY);
+				
 				for (ASTNode statement : statements) {
 					if (statement instanceof ExpressionStatement) {
 						ASTNode assignment = (ASTNode) statement.getStructuralProperty(ExpressionStatement.EXPRESSION_PROPERTY);
 						if (assignment instanceof Assignment) {
+							
 							if (((Assignment) assignment).getLeftHandSide() instanceof FieldAccess) {
 								FieldAccess fieldAccess = (FieldAccess) ((Assignment) assignment).getLeftHandSide();
 								
 								String accessedField = fieldAccess.getName().getIdentifier();
+								
+								if (field.getName().getIdentifier().equals(accessedField)) {
+									return true;
+								}
+							} 
+							
+							if (((Assignment) assignment).getLeftHandSide() instanceof SimpleName) {
+								SimpleName fieldAccess = (SimpleName) ((Assignment) assignment).getLeftHandSide();
+								
+								String accessedField = fieldAccess.getIdentifier();
 								
 								if (field.getName().getIdentifier().equals(accessedField)) {
 									return true;
