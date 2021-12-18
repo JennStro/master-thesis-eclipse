@@ -71,5 +71,6 @@ public abstract class BaseError {
     public abstract String getWhy();
 
     public abstract String getLongExplanation();
+    
 
 }

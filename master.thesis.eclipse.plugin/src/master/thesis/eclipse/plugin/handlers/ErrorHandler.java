@@ -35,9 +35,15 @@ public class ErrorHandler extends AbstractHandler {
 			
 			
 			if (!errors.isEmpty()) {
-				Editor.printToConsole(file.getName());
 				BaseError error = errors.get(0);
+				Editor.printToConsole("In file: " + file.getName() + " at line " + Editor.getLineNumber(error.getOffset()) + ". (This is also marked in your editor.)");
 				Editor.printToConsole(error.getWhat());
+				
+				if (error.hasSuggestion()) {
+					Editor.printToConsole(" ");
+					Editor.printToConsole(error.getSuggestion());
+				}
+				
 				Editor.openFile(file);
 				Editor.findAndMarkText(error.getOffset(), error.getLength());
 				return null;

@@ -92,9 +92,14 @@ public class CodeAnalyser extends ASTVisitor {
 						List<ASTNode> children = (List<ASTNode>) maybeChildren;
 						for (ASTNode child : children) {
 							if (child instanceof VariableDeclarationFragment) {
-								if (((VariableDeclarationFragment) child).getInitializer() == null) {
-									if (!fieldIsInitializedInConstructor(methods, (VariableDeclarationFragment) child)) {
-										errors.add(new FieldDeclarationWithoutInitializerError(field.getStartPosition(), field.getLength()));
+								VariableDeclarationFragment fieldDeclaration = (VariableDeclarationFragment) child;
+								if (fieldDeclaration.getInitializer() == null) {
+									if (!fieldIsInitializedInConstructor(methods, fieldDeclaration)) {
+										FieldDeclarationWithoutInitializerError fieldDeclarationError = new FieldDeclarationWithoutInitializerError(field.getStartPosition(), field.getLength());
+										fieldDeclarationError.setFieldVariableName(fieldDeclaration.getName().getIdentifier());
+										fieldDeclarationError.setFieldVariableType(fieldDeclaration.resolveBinding().getType().getName());
+										fieldDeclarationError.setClass(declaration.getName().getIdentifier());
+										errors.add(fieldDeclarationError);
 									}
 								}
 							}
