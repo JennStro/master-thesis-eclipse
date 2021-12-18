@@ -256,7 +256,10 @@ public class CodeAnalyser extends ASTVisitor {
 			
 		}
 		if (!(ifStatement.getThenStatement().getNodeType() == ASTNode.BLOCK)) {
-			errors.add(new IfWithoutBracketsError(ifStatement.getStartPosition(), ifStatement.getLength()));
+			IfWithoutBracketsError ifWithoutBracketsError = new IfWithoutBracketsError(ifStatement.getStartPosition(), ifStatement.getLength());
+			ifWithoutBracketsError.setIfStatementWithoutBody(ifStatement.getExpression().toString());
+			ifWithoutBracketsError.setThenBranch(ifStatement.getThenStatement().toString());
+			errors.add(ifWithoutBracketsError);
 			return super.visit(ifStatement);
 		}
 		return super.visit(ifStatement);
