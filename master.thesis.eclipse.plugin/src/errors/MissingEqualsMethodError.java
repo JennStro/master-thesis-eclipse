@@ -20,14 +20,16 @@ public class MissingEqualsMethodError extends BaseError {
 
 	@Override
 	public boolean hasSuggestion() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public String getSuggestion() {
-		// TODO Auto-generated method stub
-		return null;
+		return "You should add the method \n \n "
+				+ "@Override \n"
+				+ "public boolean equals(Object o) { \n"
+				+ "   //... Your implementation here... \n"
+				+ "}";
 	}
 
 	@Override
