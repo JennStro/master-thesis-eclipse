@@ -97,7 +97,7 @@ public class CodeAnalyser extends ASTVisitor {
 									if (!fieldIsInitializedInConstructor(methods, fieldDeclaration)) {
 										FieldDeclarationWithoutInitializerError fieldDeclarationError = new FieldDeclarationWithoutInitializerError(field.getStartPosition(), field.getLength());
 										fieldDeclarationError.setFieldVariableName(fieldDeclaration.getName().getIdentifier());
-										fieldDeclarationError.setFieldVariableType(fieldDeclaration.resolveBinding().getType().getName());
+										if (fieldDeclaration.resolveBinding() != null) {fieldDeclarationError.setFieldVariableType(fieldDeclaration.resolveBinding().getType().getName());}
 										fieldDeclarationError.setClass(declaration.getName().getIdentifier());
 										errors.add(fieldDeclarationError);
 									}

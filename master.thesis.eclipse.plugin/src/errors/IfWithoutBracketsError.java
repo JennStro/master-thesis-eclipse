@@ -18,17 +18,6 @@ public class IfWithoutBracketsError extends BaseError {
 	}
 
 	@Override
-	public ErrorType getErrorType() {
-		return ErrorType.IF_WITHOUT_BRACKETS;
-	}
-
-	@Override
-	public String getExampleOnHowToNotDoIt() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public boolean hasSuggestion() {
 		return this.ifStatement != null && this.thenBranch != null; }
 
@@ -42,26 +31,8 @@ public class IfWithoutBracketsError extends BaseError {
 	}
 
 	@Override
-	public String getExampleOnHowToDoIt() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public String getWhat() {
 		return "You should use brackets after if!";
-	}
-
-	@Override
-	public String getWhy() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getLongExplanation() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

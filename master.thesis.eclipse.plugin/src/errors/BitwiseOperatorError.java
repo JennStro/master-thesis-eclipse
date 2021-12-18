@@ -29,38 +29,12 @@ public class BitwiseOperatorError extends BaseError {
     }
 
     @Override
-    public ErrorType getErrorType() {
-        return errorType;
-    }
-
-    @Override
-    public String getExampleOnHowToNotDoIt() {
-        return ErrorInformation.getExampleOfHowToNotDoIt(errorType);
-    }
-
-    @Override
     public boolean hasSuggestion() {
         return this.leftOperand != null && this.operator != null && this.rightOperand != null;
     }
-
-    @Override
-    public String getExampleOnHowToDoIt() {
-        return ErrorInformation.getExampleOfHowToDoIt(errorType);
-    }
-
     @Override
     public String getWhat() {
         return ErrorInformation.getDescriptionOf(errorType);
-    }
-
-    @Override
-    public String getWhy() {
-        return ErrorInformation.getCauseOf(errorType);
-    }
-
-    @Override
-    public String getLongExplanation() {
-        return null;
     }
 
     private String convertBitwiseOperatorToConditionalOperator(String operator) {

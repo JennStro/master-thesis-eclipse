@@ -15,16 +15,6 @@ public class IgnoringReturnError extends BaseError {
         return "You should try " + this.returnType + " variableName = " + this.methodCall + ";";
     }
 
-    @Override
-    public ErrorType getErrorType() {
-        return errorType;
-    }
-
-    @Override
-    public String getExampleOnHowToNotDoIt() {
-        return ErrorInformation.getExampleOfHowToNotDoIt(errorType);
-    }
-
     public void setReturnType(String returnType) {
         this.returnType = returnType;
     }
@@ -39,22 +29,7 @@ public class IgnoringReturnError extends BaseError {
     }
 
     @Override
-    public String getExampleOnHowToDoIt() {
-        return ErrorInformation.getExampleOfHowToDoIt(errorType);
-    }
-
-    @Override
     public String getWhat() {
         return ErrorInformation.getDescriptionOf(errorType);
-    }
-
-    @Override
-    public String getWhy() {
-        return ErrorInformation.getCauseOf(errorType);
-    }
-
-    @Override
-    public String getLongExplanation() {
-        return null;
     }
 }

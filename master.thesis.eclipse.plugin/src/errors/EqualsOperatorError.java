@@ -10,11 +10,6 @@ public class EqualsOperatorError extends BaseError {
         super(offset, length);
     }
 
-    @Override
-    public ErrorType getErrorType() {
-        return errorType;
-    }
-
     public String getSuggestion() {
         return "You should try " + this.objectOne + ".equals(" + this.objectTwo + ")";
     }
@@ -28,32 +23,12 @@ public class EqualsOperatorError extends BaseError {
     }
 
     @Override
-    public String getExampleOnHowToNotDoIt() {
-        return ErrorInformation.getExampleOfHowToNotDoIt(errorType);
-    }
-
-    @Override
     public boolean hasSuggestion() {
         return this.objectOne != null && this.objectTwo != null;
     }
 
     @Override
-    public String getExampleOnHowToDoIt() {
-        return ErrorInformation.getExampleOfHowToDoIt(errorType);
-    }
-
-    @Override
     public String getWhat() {
         return ErrorInformation.getDescriptionOf(errorType);
-    }
-
-    @Override
-    public String getWhy() {
-        return ErrorInformation.getCauseOf(errorType);
-    }
-
-    @Override
-    public String getLongExplanation() {
-        return null;
     }
 }
