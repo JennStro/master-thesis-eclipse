@@ -37,6 +37,7 @@ import org.junit.jupiter.api.Test;
 import analyse.CodeAnalyser;
 import errors.BaseError;
 import errors.FieldDeclarationWithoutInitializerError;
+import errors.IfWithoutBracketsError;
 import errors.MissingEqualsMethodError;
 
 public class AnalyserTest {
@@ -195,6 +196,42 @@ public class AnalyserTest {
 		ArrayList<BaseError> errors =  analyser.getErrors();
 		Assertions.assertEquals(1, errors.size());
 		Assertions.assertTrue(errors.get(0) instanceof FieldDeclarationWithoutInitializerError);
+	}
+	
+	@Test 
+	public void ifWithoutBrackets() {
+		String code = "public class Main {"
+				+ "		public Main(int a) {"
+				+ "			if (a == 0)"
+				+ "				System.out.println(\"list\");"
+				+ "		}"
+				+ "		public boolean equals(Object o) {return false;}"
+				+ "}";
+		parser.setSource(code.toCharArray());
+		CompilationUnit ast = (CompilationUnit) parser.createAST(null);
+		ast.accept(analyser);
+		
+		ArrayList<BaseError> errors =  analyser.getErrors();
+		Assertions.assertEquals(1, errors.size());
+		Assertions.assertTrue(errors.get(0) instanceof IfWithoutBracketsError);
+	}
+	
+	@Test 
+	public void ifWithBrackets() {
+		String code = "public class Main {"
+				+ "		public Main(int a) {"
+				+ "			if (a == 0) {"
+				+ "				System.out.println(\"list\");"
+				+ "			}"
+				+ "		}"
+				+ "		public boolean equals(Object o) {return false;}"
+				+ "}";
+		parser.setSource(code.toCharArray());
+		CompilationUnit ast = (CompilationUnit) parser.createAST(null);
+		ast.accept(analyser);
+		
+		ArrayList<BaseError> errors =  analyser.getErrors();
+		Assertions.assertEquals(0, errors.size());
 	}
 	
 }
