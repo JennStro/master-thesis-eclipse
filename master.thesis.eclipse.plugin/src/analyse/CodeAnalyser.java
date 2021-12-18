@@ -223,16 +223,12 @@ public class CodeAnalyser extends ASTVisitor {
 	 */
 	@Override 
 	public boolean visit(final InfixExpression expression) {
-		System.out.println(expression);
 		if (expression.getOperator() == Operator.AND || expression.getOperator() == Operator.OR) {
 			if (expression.getLeftOperand().resolveTypeBinding().getName().equals("boolean") && expression.getRightOperand().resolveTypeBinding().getName().equals("boolean")) {
 				errors.add(new BitwiseOperatorError(expression.getStartPosition(), expression.getLength()));
 				String suggestion = "You may want to try " + expression.getLeftOperand().toString() + " " + expression.getOperator() + " " + expression.getRightOperand().toString();
 			} 
 		}
-		System.out.println(expression.getLeftOperand());
-		System.out.println(expression.getLeftOperand().resolveTypeBinding());
-		System.out.println(ASTNode.nodeClassForType(expression.getLeftOperand().getNodeType()));
 		if (expression.getOperator() == Operator.EQUALS && !expression.getLeftOperand().resolveTypeBinding().isPrimitive() && !expression.getRightOperand().resolveTypeBinding().isPrimitive() && !expression.getRightOperand().resolveTypeBinding().getName().equals("null")) {
 			if (!(expression.getLeftOperand().getNodeType() == ASTNode.STRING_LITERAL && expression.getRightOperand().getNodeType() == ASTNode.STRING_LITERAL)) {
 				errors.add(new EqualsOperatorError(expression.getStartPosition(), expression.getLength()));
@@ -249,7 +245,6 @@ public class CodeAnalyser extends ASTVisitor {
 	 */
 	@Override 
 	public boolean visit(final IfStatement ifStatement) {
-		System.out.println(ifStatement);
 		if (ifStatement.getThenStatement() instanceof EmptyStatement) {
 			errors.add(new SemiColonAfterIfError(ifStatement.getStartPosition(), ifStatement.getLength()));
 			return super.visit(ifStatement);
