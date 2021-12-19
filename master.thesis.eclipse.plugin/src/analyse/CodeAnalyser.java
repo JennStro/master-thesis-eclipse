@@ -230,8 +230,11 @@ public class CodeAnalyser extends ASTVisitor {
 	public boolean visit(final InfixExpression expression) {
 		if (expression.getOperator() == Operator.AND || expression.getOperator() == Operator.OR) {
 			if (expression.getLeftOperand().resolveTypeBinding().getName().equals("boolean") && expression.getRightOperand().resolveTypeBinding().getName().equals("boolean")) {
-				errors.add(new BitwiseOperatorError(expression.getStartPosition(), expression.getLength()));
-				String suggestion = "You may want to try " + expression.getLeftOperand().toString() + " " + expression.getOperator() + " " + expression.getRightOperand().toString();
+				BitwiseOperatorError bitwiseError = new BitwiseOperatorError(expression.getStartPosition(), expression.getLength());
+				bitwiseError.setLeftOperand(expression.getLeftOperand().toString());
+				bitwiseError.setRightOperand(expression.getRightOperand().toString());
+				bitwiseError.setOperator(expression.getOperator().toString());
+				errors.add(bitwiseError);
 			} 
 		}
 		if (expression.getOperator() == Operator.EQUALS && !expression.getLeftOperand().resolveTypeBinding().isPrimitive() && !expression.getRightOperand().resolveTypeBinding().isPrimitive() && !expression.getRightOperand().resolveTypeBinding().getName().equals("null")) {

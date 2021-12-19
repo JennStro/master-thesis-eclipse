@@ -23,10 +23,7 @@
 package tests;
 
 import java.util.ArrayList;
-import java.util.Map;
 
-import org.eclipse.jdt.core.IClassFile;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -36,6 +33,7 @@ import org.junit.jupiter.api.Test;
 
 import analyse.CodeAnalyser;
 import errors.BaseError;
+import errors.BitwiseOperatorError;
 import errors.FieldDeclarationWithoutInitializerError;
 import errors.IfWithoutBracketsError;
 import errors.MissingEqualsMethodError;
@@ -203,7 +201,7 @@ public class AnalyserTest {
 		String code = "public class Main {"
 				+ "		public Main(int a) {"
 				+ "			if (a == 0)"
-				+ "				System.out.println(\"list\");"
+				+ "				System.out.println(a);"
 				+ "		}"
 				+ "		public boolean equals(Object o) {return false;}"
 				+ "}";
@@ -214,6 +212,7 @@ public class AnalyserTest {
 		ArrayList<BaseError> errors =  analyser.getErrors();
 		Assertions.assertEquals(1, errors.size());
 		Assertions.assertTrue(errors.get(0) instanceof IfWithoutBracketsError);
+		Assertions.assertTrue(errors.get(0).hasSuggestion());
 	}
 	
 	@Test 
@@ -221,7 +220,65 @@ public class AnalyserTest {
 		String code = "public class Main {"
 				+ "		public Main(int a) {"
 				+ "			if (a == 0) {"
-				+ "				System.out.println(\"list\");"
+				+ "				System.out.println(a);"
+				+ "			}"
+				+ "		}"
+				+ "		public boolean equals(Object o) {return false;}"
+				+ "}";
+		parser.setSource(code.toCharArray());
+		CompilationUnit ast = (CompilationUnit) parser.createAST(null);
+		ast.accept(analyser);
+		
+		ArrayList<BaseError> errors =  analyser.getErrors();
+		Assertions.assertEquals(0, errors.size());
+	}
+	
+	@Test 
+	public void usingAndBitwiseOperator() {
+		String code = "public class Main {"
+				+ "		public Main(int a, int b) {"
+				+ "			if (a == 0 & b == 0) {"
+				+ "				System.out.println(a);"
+				+ "			}"
+				+ "		}"
+				+ "		public boolean equals(Object o) {return false;}"
+				+ "}";
+		parser.setSource(code.toCharArray());
+		CompilationUnit ast = (CompilationUnit) parser.createAST(null);
+		ast.accept(analyser);
+		
+		ArrayList<BaseError> errors =  analyser.getErrors();
+		Assertions.assertEquals(1, errors.size());
+		Assertions.assertTrue(errors.get(0) instanceof BitwiseOperatorError);
+		Assertions.assertTrue(errors.get(0).hasSuggestion());
+	}
+	
+	@Test 
+	public void usingOrBitwiseOperator() {
+		String code = "public class Main {"
+				+ "		public Main(int a, int b) {"
+				+ "			if (a == 0 | b == 0) {"
+				+ "				System.out.println(a);"
+				+ "			}"
+				+ "		}"
+				+ "		public boolean equals(Object o) {return false;}"
+				+ "}";
+		parser.setSource(code.toCharArray());
+		CompilationUnit ast = (CompilationUnit) parser.createAST(null);
+		ast.accept(analyser);
+		
+		ArrayList<BaseError> errors =  analyser.getErrors();
+		Assertions.assertEquals(1, errors.size());
+		Assertions.assertTrue(errors.get(0) instanceof BitwiseOperatorError);
+		Assertions.assertTrue(errors.get(0).hasSuggestion());
+	}
+	
+	@Test 
+	public void usingConditionalOperator() {
+		String code = "public class Main {"
+				+ "		public Main(int a, int b) {"
+				+ "			if (a == 0 && b == 0) {"
+				+ "				System.out.println(a);"
 				+ "			}"
 				+ "		}"
 				+ "		public boolean equals(Object o) {return false;}"
