@@ -99,7 +99,6 @@ public class Editor {
 			} catch (CoreException e) {
 				e.printStackTrace();
 			}
-			System.out.println(visitor.getFiles());
 			return visitor.getFiles();
 			
 		}
