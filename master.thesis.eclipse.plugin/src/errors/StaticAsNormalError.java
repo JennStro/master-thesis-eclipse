@@ -2,7 +2,6 @@ package errors;
 
 public class StaticAsNormalError extends BaseError {
 
-    private static final ErrorType errorType = ErrorType.STATIC_AS_NORMAL;
     private String containingClass;
     private String methodCall;
 
@@ -30,6 +29,6 @@ public class StaticAsNormalError extends BaseError {
 
     @Override
     public String getWhat() {
-        return ErrorInformation.getDescriptionOf(errorType);
+        return  "You are calling a static method on an object.";
     }
 }

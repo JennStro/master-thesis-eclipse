@@ -2,7 +2,6 @@ package errors;
 
 public class BitwiseOperatorError extends BaseError {
 
-    private static final ErrorType errorType = ErrorType.BITWISE_OPERATOR;
     private String leftOperand;
     private String operator;
     private String rightOperand;
@@ -13,7 +12,7 @@ public class BitwiseOperatorError extends BaseError {
 
     @Override
     public String getSuggestion() {
-        return "You should try " + this.leftOperand + " " + convertBitwiseOperatorToConditionalOperator(this.operator) + " " + this.rightOperand;
+        return "You should try: \n \n" + this.leftOperand + " " + convertBitwiseOperatorToConditionalOperator(this.operator) + " " + this.rightOperand;
     }
 
     public void setLeftOperand(String leftOperand) {
@@ -34,7 +33,7 @@ public class BitwiseOperatorError extends BaseError {
     }
     @Override
     public String getWhat() {
-        return ErrorInformation.getDescriptionOf(errorType);
+        return "You are using the bitwiseoperator (& or |) as a logical operator.";
     }
 
     private String convertBitwiseOperatorToConditionalOperator(String operator) {

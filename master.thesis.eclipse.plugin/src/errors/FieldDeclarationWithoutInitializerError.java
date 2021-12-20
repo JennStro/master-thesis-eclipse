@@ -33,7 +33,7 @@ public class FieldDeclarationWithoutInitializerError extends BaseError {
 	public String getSuggestion() {
 		return "You could initialize the fieldvariable in the constructor: \n \n"
 				+ "public " + this.className + "(" + this.type + " " + this.name + ") { \n "
-						+ "	this." + this.name + " = " + this.name + "\n"
+						+ "	this." + this.name + " = " + this.name + ";\n"
 						+ "}";
 	}
 

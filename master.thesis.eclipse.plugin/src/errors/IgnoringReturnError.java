@@ -3,7 +3,6 @@ package errors;
 
 public class IgnoringReturnError extends BaseError {
 
-    private static final ErrorType errorType = ErrorType.IGNORING_RETURN_VALUE;
     private String returnType;
     private String methodCall;
 
@@ -30,6 +29,6 @@ public class IgnoringReturnError extends BaseError {
 
     @Override
     public String getWhat() {
-        return ErrorInformation.getDescriptionOf(errorType);
+        return "You are ignoring a return value.";
     }
 }

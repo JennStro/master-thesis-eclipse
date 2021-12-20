@@ -2,7 +2,6 @@ package errors;
 
 public class EqualsOperatorError extends BaseError {
 
-    private static final ErrorType errorType = ErrorType.NOT_USING_EQUALS;
     private String objectOne;
     private String objectTwo;
 
@@ -29,6 +28,6 @@ public class EqualsOperatorError extends BaseError {
 
     @Override
     public String getWhat() {
-        return ErrorInformation.getDescriptionOf(errorType);
+        return "You are using \"==\" to compare objects.";
     }
 }

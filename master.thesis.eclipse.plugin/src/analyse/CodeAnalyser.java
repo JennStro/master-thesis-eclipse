@@ -239,8 +239,10 @@ public class CodeAnalyser extends ASTVisitor {
 		}
 		if (expression.getOperator() == Operator.EQUALS && !expression.getLeftOperand().resolveTypeBinding().isPrimitive() && !expression.getRightOperand().resolveTypeBinding().isPrimitive() && !expression.getRightOperand().resolveTypeBinding().getName().equals("null")) {
 			if (!(expression.getLeftOperand().getNodeType() == ASTNode.STRING_LITERAL && expression.getRightOperand().getNodeType() == ASTNode.STRING_LITERAL)) {
-				errors.add(new EqualsOperatorError(expression.getStartPosition(), expression.getLength()));
-				String suggestion = "You should try \n "+ expression.getLeftOperand().toString() + ".equals("+ expression.getRightOperand().toString()  +")";
+				EqualsOperatorError equalsError = new EqualsOperatorError(expression.getStartPosition(), expression.getLength());
+				equalsError.setObjectOne(expression.getLeftOperand().toString());
+				equalsError.setObjectTwo(expression.getRightOperand().toString());
+				errors.add(equalsError);
 			}
 		}
 		return super.visit(expression);

@@ -2,8 +2,6 @@ package errors;
 
 public class SemiColonAfterIfError extends BaseError {
 
-    private static final ErrorType errorType = ErrorType.SEMICOLON_AFTER_IF;
-
     public SemiColonAfterIfError(int offset, int length) {
         super(offset, length);
     }
@@ -19,7 +17,7 @@ public class SemiColonAfterIfError extends BaseError {
 
     @Override
     public String getWhat() {
-        return ErrorInformation.getDescriptionOf(errorType);
+        return "You have a semicolon (;) after an if-statement.";
     }
 
 }
