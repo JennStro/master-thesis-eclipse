@@ -1,5 +1,8 @@
 ## Changelog 
 
+### :star: 2.2.0    
+New feature: Add suggestions on what to do to fix the error.
+
 ### :star: 2.1.0
 New feature: Checks for not implementing equals, no brackets after if, fieldvariable without initalization.   
 New feature: Analyse all files in the project.
