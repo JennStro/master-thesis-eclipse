@@ -186,10 +186,10 @@ public class CodeAnalyser extends ASTVisitor {
 	public boolean visit(final MethodInvocation method) {
 		if (!(methodReturnsVoid(method) || methodReturnsBoolean(method))) {
 			if (method.getParent().getNodeType() == ASTNode.EXPRESSION_STATEMENT) {
-				errors.add(new IgnoringReturnError(method.getStartPosition(), method.getLength()));
-				String suggestion =  "The call of this method has no effect unless you store it in a variable. \n"
-						+ "This method returns " + method.resolveMethodBinding().getReturnType().getName() + " and you should consider doing this: \n \n" +
-						method.resolveMethodBinding().getReturnType().getName() + " variableName = " + method.toString();
+				IgnoringReturnError ignoringReturnError = new IgnoringReturnError(method.getStartPosition(), method.getLength());
+				ignoringReturnError.setMethodCall(method.toString());
+				ignoringReturnError.setReturnType(method.resolveMethodBinding().getReturnType().getName());
+				errors.add(ignoringReturnError);
 			} 
 		}
 		if (Modifier.isStatic(method.resolveMethodBinding().getModifiers()) && method.getExpression() != null) {

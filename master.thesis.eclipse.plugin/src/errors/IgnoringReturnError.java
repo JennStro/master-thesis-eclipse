@@ -11,7 +11,7 @@ public class IgnoringReturnError extends BaseError {
     }
     @Override
     public String getSuggestion() {
-        return "You should try " + this.returnType + " variableName = " + this.methodCall + ";";
+        return "You should try \n\n" + this.returnType + " variableName = " + this.methodCall + ";";
     }
 
     public void setReturnType(String returnType) {

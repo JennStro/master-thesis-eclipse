@@ -37,6 +37,7 @@ import errors.BitwiseOperatorError;
 import errors.EqualsOperatorError;
 import errors.FieldDeclarationWithoutInitializerError;
 import errors.IfWithoutBracketsError;
+import errors.IgnoringReturnError;
 import errors.MissingEqualsMethodError;
 
 public class AnalyserTest {
@@ -312,5 +313,22 @@ public class AnalyserTest {
 		Assertions.assertTrue(errors.get(0).hasSuggestion());
 	}
 	
+	@Test 
+	public void ignoringReturnValue() {
+		String code = "public class Main {"
+				+ "		public Main(String a) {"
+				+ "			a.toLowerCase();"
+				+ "		}"
+				+ "		public boolean equals(Object o) {return false;}"
+				+ "}";
+		parser.setSource(code.toCharArray());
+		CompilationUnit ast = (CompilationUnit) parser.createAST(null);
+		ast.accept(analyser);
+		
+		ArrayList<BaseError> errors =  analyser.getErrors();
+		Assertions.assertEquals(1, errors.size());
+		Assertions.assertTrue(errors.get(0) instanceof IgnoringReturnError);
+		Assertions.assertTrue(errors.get(0).hasSuggestion());
+	}
 	
 }
