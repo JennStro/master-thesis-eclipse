@@ -2,17 +2,24 @@ package errors;
 
 public class SemiColonAfterIfError extends BaseError {
 
-    public SemiColonAfterIfError(int offset, int length) {
+
+    private String condition;
+
+	public SemiColonAfterIfError(int offset, int length) {
         super(offset, length);
+    }
+    
+    public void setCondition(String condition) {
+    	this.condition = condition;
     }
 
     public String getSuggestion() {
-        return "You should try to remove the semicolon (;).";
+        return "You should try \n \n if (" + this.condition + ") {\n 	// ...your code here... \n}";
     }
 
     @Override
     public boolean hasSuggestion() {
-        return true;
+        return this.condition != null;
     }
 
     @Override

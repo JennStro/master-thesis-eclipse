@@ -256,7 +256,9 @@ public class CodeAnalyser extends ASTVisitor {
 	@Override 
 	public boolean visit(final IfStatement ifStatement) {
 		if (ifStatement.getThenStatement() instanceof EmptyStatement) {
-			errors.add(new SemiColonAfterIfError(ifStatement.getStartPosition(), ifStatement.getLength()));
+			SemiColonAfterIfError semiAfterIf = new SemiColonAfterIfError(ifStatement.getStartPosition(), ifStatement.getLength());
+			semiAfterIf.setCondition(ifStatement.getExpression().toString());
+			errors.add(semiAfterIf);
 			return super.visit(ifStatement);
 			
 		}
