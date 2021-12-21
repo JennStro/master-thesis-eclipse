@@ -23,7 +23,7 @@ package analyse;
 
 
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;	
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -38,7 +38,6 @@ import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IMethodBinding;
-import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -46,7 +45,6 @@ import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.ThisExpression;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
@@ -74,6 +72,7 @@ public class CodeAnalyser extends ASTVisitor {
 	@Override
 	public boolean visit(final TypeDeclaration declaration) {
 		if (declaration.resolveBinding().isClass()) {
+			@SuppressWarnings("unchecked")
 			List<BodyDeclaration> body = declaration.bodyDeclarations();
 			boolean hasEqualsMethod = false;
 			boolean overridesEqualMethod = false;
@@ -89,6 +88,7 @@ public class CodeAnalyser extends ASTVisitor {
 					Object maybeChildren = field.getStructuralProperty(FieldDeclaration.FRAGMENTS_PROPERTY);
 					
 					if (maybeChildren != null) {
+						@SuppressWarnings("unchecked")
 						List<ASTNode> children = (List<ASTNode>) maybeChildren;
 						for (ASTNode child : children) {
 							if (child instanceof VariableDeclarationFragment) {
@@ -145,6 +145,7 @@ public class CodeAnalyser extends ASTVisitor {
 			if (((MethodDeclaration) method).isConstructor()) {
 				Block constructorBody = (Block) method.getStructuralProperty(MethodDeclaration.BODY_PROPERTY);
 				
+				@SuppressWarnings("unchecked")
 				List<ASTNode> statements = (List<ASTNode>) constructorBody.getStructuralProperty(Block.STATEMENTS_PROPERTY);
 				for (ASTNode statement : statements) {
 					if (statement instanceof ExpressionStatement) {

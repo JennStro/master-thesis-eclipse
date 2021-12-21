@@ -7,15 +7,11 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.handlers.HandlerUtil;
 
-import errors.BaseError;
 import analyse.CodeAnalyser;
 import analyse.Parser;
 import editor.Editor;
-
-import org.eclipse.jface.dialogs.MessageDialog;
+import errors.BaseError;
 
 public class ErrorHandler extends AbstractHandler {
 
