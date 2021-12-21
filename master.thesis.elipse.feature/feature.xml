@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="master.thesis.elipse.feature"
+      id="master.thesis.eclipse.feature"
       label="Master thesis eclipse feature"
-      version="2.2.0.qualifier">
+      version="2.2.1.qualifier">
 
    <description url="http://www.example.com/description">
       [Enter Feature Description here.]
@@ -32,7 +32,7 @@
          id="master.thesis.eclipse.plugin"
          download-size="0"
          install-size="0"
-         version="2.2.0"
+         version="0.0.0"
          unpack="false"/>
 
 </feature>

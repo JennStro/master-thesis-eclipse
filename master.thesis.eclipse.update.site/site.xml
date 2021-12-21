@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/master.thesis.elipse.feature_2.2.0.202112210709.jar" id="master.thesis.elipse.feature" version="2.2.0.202112210709">
+   <feature url="features/master.thesis.eclipse.feature_2.2.1.202112210948.jar" id="master.thesis.eclipse.feature" version="2.2.1.202112210948">
       <category name="master"/>
    </feature>
    <category-def name="master" label="master"/>
