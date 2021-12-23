@@ -1,5 +1,8 @@
 ## Changelog 
 
+### 🐛 2.2.1 
+Bug: Version conflict - bump to 2.2.1
+
 ### :star: 2.2.0    
 New feature: Add suggestions on what to do to fix the error.
 
