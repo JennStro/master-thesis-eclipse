@@ -52,7 +52,7 @@
             <command
                   id="master.thesis.eclipse.plugin.toolbars.errorFinderCommand"
                   commandId="master.thesis.eclipse.plugin.commands.errorFinderCommand"
-                  icon="icons/sample.png"
+                  icon="icons/bug_icon_small.ico"
                   tooltip="Find errors">
             </command>
          </toolbar>

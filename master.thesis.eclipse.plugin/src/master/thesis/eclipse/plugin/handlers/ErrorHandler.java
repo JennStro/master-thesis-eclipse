@@ -1,17 +1,18 @@
 package master.thesis.eclipse.plugin.handlers;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.core.runtime.CoreException;
 
-import analyse.CodeAnalyser;
-import analyse.Parser;
+import master.thesis.backend.analyser.Analyser;
 import editor.Editor;
-import errors.BaseError;
+import master.thesis.backend.errors.BaseError;
+import master.thesis.backend.errors.BugReport;
 
 public class ErrorHandler extends AbstractHandler {
 
@@ -21,33 +22,42 @@ public class ErrorHandler extends AbstractHandler {
 		Editor.updateEditor();
 		Editor.clearConsole();
 		
-		ArrayList<IFile> files = Editor.getProjectFiles();
+		IFile file = Editor.getSelectedFile();
 		
-		for (IFile file : files) {
-			CompilationUnit ast = (CompilationUnit) Parser.createAST(file);
-			CodeAnalyser analyser = new CodeAnalyser();
-			ast.accept(analyser);
-			ArrayList<BaseError> errors = analyser.getErrors();
-			
-			
-			if (!errors.isEmpty()) {
-				BaseError error = errors.get(0);
-				Editor.printToConsole("In file: " + file.getName() + " at line " + Editor.getLineNumber(error.getOffset()) + ". (This is also marked in your editor.)");
-				Editor.printToConsole(error.getWhat());
-				
-				if (error.hasSuggestion()) {
-					Editor.printToConsole(" ");
-					Editor.printToConsole(error.getSuggestion());
-				}
-				
-				Editor.openFile(file);
-				Editor.findAndMarkText(error.getOffset(), error.getLength());
-				return null;
-			} 
+		String code = "";
+		try {
+			code = new String(file.getContents().readAllBytes(), StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (CoreException e) {
+			e.printStackTrace();
 		}
 		
-		Editor.printToConsole("Found no errors!");
+		Analyser analyser = new Analyser();
+		BugReport bugReport = analyser.analyse(code);
 		
+		if (!bugReport.getBugs().isEmpty()) {
+			BaseError error = bugReport.getBugs().get(0);
+			if (error.getLineNumber() != -1) {
+				Editor.printToConsole("In file: " + file.getName() + ", in class " + error.getContainingClass() + ", at line " + error.getLineNumber() + ":");
+			} else {
+				Editor.printToConsole("In file: " + file.getName() + "in class " + error.getContainingClass()  + ":");
+			}
+			
+			Editor.printToConsole(error.getWhat());
+			
+			if (error.getSuggestion().isPresent()) {
+				Editor.printToConsole(" ");
+				Editor.printToConsole(error.getSuggestion().get());
+			}
+			
+			Editor.openFile(file);
+			Editor.findAndMarkText(error.getOffset(), error.getLength());
+			return null;
+		} 
+	
+		
+		Editor.printToConsole("Found no errors!");
 		return null;
 	}
 }
