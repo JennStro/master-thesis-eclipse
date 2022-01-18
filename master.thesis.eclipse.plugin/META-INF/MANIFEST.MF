@@ -14,4 +14,5 @@ Require-Bundle: org.eclipse.ui,
  org.junit.jupiter.api;bundle-version="5.8.1"
 Automatic-Module-Name: master.thesis.eclipse.plugin
 Bundle-RequiredExecutionEnvironment: JavaSE-11
-Bundle-ClassPath: .
+Bundle-ClassPath: .,
+ library/json-20211205.jar

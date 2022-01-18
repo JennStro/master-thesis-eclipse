@@ -10,6 +10,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.json.JSONObject;
 
 import editor.Editor;
 
@@ -20,6 +21,9 @@ public class ErrorHandler extends AbstractHandler {
 	private static final String LINENUMBER_KEY = "\"lineNumber\":";
 	private static final String EXPLANATION_KEY = "\"explanation\":";
 	private static final String SUGGESTION_KEY = "\"suggestion\":";
+	private static final String HASEXCEPTION = "\"hasException\":true";
+	private static final String MOREINFOLINK_KEY = "\"moreInfoLink\":";
+	private static final String TIP_KEY = "\"tip\":";
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -46,19 +50,32 @@ public class ErrorHandler extends AbstractHandler {
 				}
             }
             String response = new String(http.getInputStream().readAllBytes());
+            JSONObject obj = new JSONObject(response);
             
-            if (response.contains(ERRORS)) {
-                String result = "In class " + getValue(CONTAINING_CLASS_KEY, response);
-                if (Integer.parseInt(getValue(LINENUMBER_KEY, response)) != -1) {
-                   result += ", on line number " + getValue(LINENUMBER_KEY, response) + "\n";
-                }
-                result += getValue(EXPLANATION_KEY, response) + "\n";
-                if (response.contains(SUGGESTION_KEY)) {
-                    result += getValue(SUGGESTION_KEY, response);
-                }
+            
+            if (obj.has("hasException") && obj.getBoolean("hasException")) {
+                String result = "Uh oh, could not analyse your code! :(";
                 Editor.printToConsole(result);
             } else {
-            	Editor.printToConsole("Found no errors!");
+                if (obj.get("status").equals("errors")) {
+                    String result = "In class " + obj.getString("containingClass");
+                    if (obj.getInt("lineNumber") != -1) {
+                        result += ", on line number " + obj.get("lineNumber");
+                    }
+                    result += "\n\n" + obj.getString("explanation");
+                    if (obj.has("suggestion")) {
+                        result += "\n \nYou should try \n" + obj.getString("suggestion");
+                    }
+                    if (obj.has("moreInfoLink")) {
+                        result += "\n\nMore info? Check out " + obj.get("moreInfoLink");
+                    }
+                    if (obj.has("tip")) {
+                        result += "\n\n" + obj.get("tip");
+                    }
+                    Editor.printToConsole(result);
+                } else {
+                	Editor.printToConsole("Found no errors!");
+                }
             }
             
 
@@ -68,12 +85,5 @@ public class ErrorHandler extends AbstractHandler {
             ex.printStackTrace();
         }
 		return null;
-	}
-	
-	private String getValue(String KEY, String obj) {
-		String sub = obj.substring(obj.indexOf(KEY)+KEY.length());
-		String val = sub.substring(0, sub.indexOf(","));
-		String valStripped = val.replace('"', ' ');
-		return valStripped;
 	}
 }
