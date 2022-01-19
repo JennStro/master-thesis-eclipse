@@ -1,5 +1,8 @@
 ## Changelog 
 
+### :star: 2.3.0   
+New feature: Show link and tip if available
+
 ### 🐛 2.2.1 
 Bug: Version conflict - bump to 2.2.1
 

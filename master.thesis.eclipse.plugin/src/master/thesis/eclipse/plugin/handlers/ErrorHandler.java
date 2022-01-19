@@ -15,15 +15,6 @@ import org.json.JSONObject;
 import editor.Editor;
 
 public class ErrorHandler extends AbstractHandler {
-	
-	private static final String CONTAINING_CLASS_KEY = "\"containingClass\":";
-	private static final String ERRORS = "\"status\":\"errors\"";
-	private static final String LINENUMBER_KEY = "\"lineNumber\":";
-	private static final String EXPLANATION_KEY = "\"explanation\":";
-	private static final String SUGGESTION_KEY = "\"suggestion\":";
-	private static final String HASEXCEPTION = "\"hasException\":true";
-	private static final String MOREINFOLINK_KEY = "\"moreInfoLink\":";
-	private static final String TIP_KEY = "\"tip\":";
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
