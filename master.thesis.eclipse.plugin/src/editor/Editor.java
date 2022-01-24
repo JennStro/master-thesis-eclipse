@@ -35,14 +35,7 @@
 
 package editor;
 
-import java.util.ArrayList;
-
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.IEditorPart;
@@ -84,37 +77,6 @@ public class Editor {
 	public static IFile getSelectedFile() {
 		IFileEditorInput input = (IFileEditorInput) editor.getEditorInput();
 		return input.getFile();
-	}
-	
-	public static ArrayList<IFile> getProjectFiles() {
-		IProject project = getProject();
-		if (project != null && project.isOpen()) {
-			ResourceVisitor visitor = new ResourceVisitor();
-			try {
-				project.accept(visitor);
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
-			return visitor.getFiles();
-			
-		}
-		return null;
-	}
-	
-	private static IProject getProject() {
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IProject project = workspace.getRoot().getProject();
-		if (project == null) {
-			IProject activeProject = editor.getEditorInput().getAdapter(IProject.class);
-			if (activeProject != null) {
-				project = activeProject;
-			} else {
-				IResource res = editor.getEditorInput().getAdapter(IResource.class);
-				IProject activeProjectFromResource = res.getProject();
-				project = activeProjectFromResource;
-			}
-		}
-		return project;
 	}
 	
 	public static IWorkbenchPage getPage() {

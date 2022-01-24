@@ -26,8 +26,7 @@ public class ErrorHandler extends AbstractHandler {
 		
 		try {
             URL url = new URL("https://master-thesis-web-backend-prod.herokuapp.com/analyse");
-            URLConnection con = url.openConnection();
-            HttpURLConnection http = (HttpURLConnection) con;
+            HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod("POST");
             http.setDoOutput(true);
             http.setRequestProperty("Content-Type", "text/plain; charset=UTF-8");
@@ -44,8 +43,8 @@ public class ErrorHandler extends AbstractHandler {
             JSONObject obj = new JSONObject(response);
             
             
-            if (obj.has("hasException") && obj.getBoolean("hasException")) {
-                String result = "Uh oh, could not analyse your code! :(";
+            if (obj.has("hasException")) {
+                String result = obj.getString("hasException");
                 Editor.printToConsole(result);
             } else {
                 if (obj.get("status").equals("errors")) {
